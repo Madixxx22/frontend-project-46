@@ -2,7 +2,7 @@
   "name": "@hexlet/code",
   "version": "1.0.0",
   "description": "[![Actions Status](https://github.com/Madixxx22/frontend-project-46/workflows/hexlet-check/badge.svg)](https://github.com/Madixxx22/frontend-project-46/actions)",
-  "main": "index.js",
+  "main": "bin/gendiff.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,7 +17,10 @@
   },
   "homepage": "https://github.com/Madixxx22/frontend-project-46#readme",
   "dependencies": {
-    "commander": "^10.0.0"
+    "commander": "^10.0.0",
+    "fs": "^0.0.1-security",
+    "lodash": "^4.17.21",
+    "path": "^0.12.7"
   },
   "type": "module",
   "bin": {

@@ -1,2 +1,2 @@
 start:
-	node bin/gendiff.js gendiff
+	gendiff 'file1.json' 'file2.json'
