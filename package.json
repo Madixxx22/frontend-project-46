@@ -18,12 +18,19 @@
   "homepage": "https://github.com/Madixxx22/frontend-project-46#readme",
   "dependencies": {
     "commander": "^10.0.0",
+    "eslint": "^8.34.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5",
     "fs": "^0.0.1-security",
+    "jest": "^29.4.2",
     "lodash": "^4.17.21",
     "path": "^0.12.7"
   },
   "type": "module",
   "bin": {
     "gendiff": "bin/gendiff.js"
+  },
+  "scripts": {
+    "test": "npx jest"
   }
 }

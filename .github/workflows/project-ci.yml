@@ -1,0 +1,35 @@
+name: Check javascript project CI
+
+on: 
+  - push
+  - pull_request
+
+env:
+  CI: true
+
+jobs: 
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up node ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: Install dependencies
+        run: |
+          make install
+      - name: Start linter and tests
+        run: |
+          make check
+    - name: Test and publish code coverage
+      uses: paambaati/codeclimate-action@v3.2.0
+      env:
+        CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+      with:
+        coverageCommand: make coverage
+        debug: true
