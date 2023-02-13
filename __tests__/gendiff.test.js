@@ -23,3 +23,17 @@ test('success-flat-yml', () => {
   const result = getFixturePath('flat-result.txt');
   expect(genDiff(filePath1, filePath2)).toBe(fs.readFileSync(result, 'utf-8'));
 });
+
+test('success-deep-json', () => {
+  const filePath1 = getFixturePath('deep-file1.json');
+  const filePath2 = getFixturePath('deep-file2.json');
+  const result = getFixturePath('deep-result.txt');
+  expect(genDiff(filePath1, filePath2)).toBe(fs.readFileSync(result, 'utf-8'));
+});
+
+test('success-deep-yml', () => {
+  const filePath1 = getFixturePath('deep-file1.yml');
+  const filePath2 = getFixturePath('deep-file2.yml');
+  const result = getFixturePath('deep-result.txt');
+  expect(genDiff(filePath1, filePath2)).toBe(fs.readFileSync(result, 'utf-8'));
+});

@@ -1,21 +1,10 @@
 import _ from 'lodash';
 
-export const formatting = (diff) => {
-  let result = '{\n';
-  /* eslint-disable-next-line */
-    for (const item of diff) {
-    if (item.status === 'added') {
-      result += `  + ${item.key}: ${item.new}\n`;
-    } else if (item.status === 'removed') {
-      result += `  - ${item.key}: ${item.old}\n`;
-    } else if (item.status === 'unchanged') {
-      result += `    ${item.key}: ${item.value}\n`;
-    } else if (item.status === 'changed') {
-      result += `  - ${item.key}: ${item.old}\n`;
-      result += `  + ${item.key}: ${item.new}\n`;
-    }
+const isChild = (item) => {
+  if (typeof item === 'object') {
+    return true;
   }
-  return `${result}}`;
+  return false;
 };
 
 export const engineDiff = (firstObj, SecondObj) => {
@@ -24,21 +13,28 @@ export const engineDiff = (firstObj, SecondObj) => {
     const mergeKey = Object.keys(
       _.merge(_.cloneDeep(obj1), obj2),
     ).sort();
+    /* eslint-disable-next-line */
+    for (const key of mergeKey) {
       /* eslint-disable-next-line */
-      for (const key of mergeKey) {
-      /* eslint-disable-next-line */
-        if (obj1.hasOwnProperty(key) === false) {
+      if (obj1.hasOwnProperty(key) === false) {
         diff.push({
           key,
           new: obj2[key],
           status: 'added',
         });
-        /* eslint-disable-next-line */
-        } else if (obj2.hasOwnProperty(key) === false) {
+      /* eslint-disable-next-line */
+      } else if (obj2.hasOwnProperty(key) === false) {
         diff.push({
           key,
           old: obj1[key],
           status: 'removed',
+        });
+      } else if (isChild(obj1[key]) && isChild(obj2[key])) {
+        const child = iter(obj1[key], obj2[key]);
+        diff.push({
+          key,
+          children: child,
+          status: 'nested',
         });
       } else if (obj1[key] === obj2[key]) {
         diff.push({
@@ -60,3 +56,5 @@ export const engineDiff = (firstObj, SecondObj) => {
 
   return iter(firstObj, SecondObj);
 };
+
+export default engineDiff;

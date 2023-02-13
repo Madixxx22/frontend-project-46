@@ -1,12 +1,13 @@
 import fs from 'node:fs';
 import path from 'path';
 import { getParsingData } from './parsers.js';
-import { engineDiff, formatting } from './generate-difference.js';
+import { engineDiff } from './generate-difference.js';
+import { formatting } from './formatter/formatter.js';
 
 const getData = (filepath) => fs.readFileSync(path.resolve(process.cwd(), filepath), 'utf8');
 
 /* eslint-disable-next-line */
-export const genDiff = (filepath1, filepath2, format) => {
+export const genDiff = (filepath1, filepath2, format = 'stylish') => {
   try {
     const firstFile = getParsingData(getData(filepath1), filepath1);
     const secondFile = getParsingData(getData(filepath2), filepath2);
@@ -14,7 +15,7 @@ export const genDiff = (filepath1, filepath2, format) => {
       return 'Неверный формат файлов';
     }
     const difference = engineDiff(firstFile, secondFile);
-    return formatting(difference);
+    return formatting(difference, format);
   } catch (err) {
     console.log(err);
   }
