@@ -4,3 +4,5 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/fde78d3c3a461cc80289/maintainability)](https://codeclimate.com/github/Madixxx22/frontend-project-46/maintainability)
 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fde78d3c3a461cc80289/test_coverage)](https://codeclimate.com/github/Madixxx22/frontend-project-46/test_coverage)
+
+На стадии рефакторинга просьба не проверять.
