@@ -1,9 +1,7 @@
 import _ from 'lodash';
 
 export const engineDiff = (obj1, obj2) => {
-  const mergeKeys = Object.keys(
-    _.merge(_.cloneDeep(obj1), obj2),
-  ).sort();
+  const mergeKeys = _.sortBy(Object.keys(_.merge(_.cloneDeep(obj1), obj2)));
   const diff = mergeKeys.map((key) => {
     if (!_.has(obj1, key)) {
       return { key, new: obj2[key], status: 'added' };
