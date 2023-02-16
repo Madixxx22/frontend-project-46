@@ -1,4 +1,4 @@
-import fs from 'node:fs';
+import fs from 'fs';
 import path from 'path';
 import { getParsingData } from './parsers.js';
 import { engineDiff } from './generate-difference.js';
@@ -6,7 +6,6 @@ import { formatting } from './formatter/formatter.js';
 
 const getData = (filepath) => fs.readFileSync(path.resolve(process.cwd(), filepath), 'utf8');
 
-/* eslint-disable-next-line */
 export const genDiff = (filepath1, filepath2, format = 'stylish') => {
   try {
     const firstFile = getParsingData(getData(filepath1), filepath1);
@@ -17,7 +16,7 @@ export const genDiff = (filepath1, filepath2, format = 'stylish') => {
     const difference = engineDiff(firstFile, secondFile);
     return formatting(difference, format);
   } catch (err) {
-    console.log(err);
+    return err;
   }
 };
 

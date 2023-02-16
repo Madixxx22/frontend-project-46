@@ -1,6 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import fs from 'node:fs';
+import fs from 'fs';
 /* eslint-disable-next-line */
 import { test, expect } from '@jest/globals';
 import { genDiff } from '../src/gendiff.js';

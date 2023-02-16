@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const getValue = (value) => {
   if (typeof value === 'object' && value !== null) {
     return '[complex value]';
@@ -8,33 +10,31 @@ const getValue = (value) => {
 };
 
 const getChildren = (obj) => {
-  /* eslint-disable-next-line */
-  if (obj.hasOwnProperty('children')) {
+  if (_.has(obj, 'children')) {
     return obj.children;
   }
-  return obj;
+  return [];
 };
 
-const getPlain = (diff, path = '') => {
-  const plainData = [];
-  const data = getChildren(diff);
-  /* eslint-disable-next-line */
-  for (const item of data) {
-    const currentPath = `${path}${item.key}`;
-    const { status } = item;
-    if (status === 'added') {
-      plainData.push(`Property '${currentPath}' was added with value: ${getValue(item.new)}`);
-    } else if (status === 'removed') {
-      plainData.push(`Property '${currentPath}' was removed`);
-    } else if (status === 'changed') {
-      plainData.push(`Property '${currentPath}' was updated. From ${getValue(item.old)} to ${getValue(item.new)}`);
-    } else if (status === 'nested') {
-      plainData.push(getPlain(getChildren(item), `${currentPath}.`));
-    }
+const buildPlain = (item, path = '') => {
+  const currentPath = `${path}${item.key}`;
+  const { status } = item;
+  if (status === 'added') {
+    return `Property '${currentPath}' was added with value: ${getValue(item.new)}\n`;
+  } if (status === 'removed') {
+    return `Property '${currentPath}' was removed\n`;
+  } if (status === 'changed') {
+    return `Property '${currentPath}' was updated. From ${getValue(item.old)} to ${getValue(item.new)}\n`;
+  } if (status === 'nested') {
+    const data = getChildren(item).map((child) => buildPlain(child, `${currentPath}.`));
+    return data.join('');
   }
-  return plainData.join('\n');
+  return '';
 };
 
-export const plain = (diff) => getPlain(diff, '');
+export const plain = (difference) => {
+  const lines = difference.map((item) => buildPlain(item));
+  return lines.join('').slice(0, -1);
+};
 
 export default plain;

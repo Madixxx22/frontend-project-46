@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const sign = {
   added: '  + ',
   removed: '  - ',
@@ -5,76 +7,56 @@ const sign = {
   nested: '    ',
 };
 
-const getString = (item, deep, value = '', specSign = '') => `${sign.nested.repeat(deep)}${sign[item.status]}${item.key}: ${value}${specSign}\n`;
+const getStringBase = (status = 'unchanged', key = '', value = '', deep = 0, specSign = '') => `${sign.nested.repeat(deep)}${sign[status]}${key}: ${specSign}${value}`;
 
-const getObjectString = (obj, deep) => {
-  let result = '';
+const getStringObject = (obj, deep) => {
   const keys = Object.keys(obj);
-  /* eslint-disable-next-line */
-  for (const key of keys) {
-    if (typeof obj[key] === 'object') {
-      result += `${sign.nested.repeat(deep)}${key}: {\n`;
-      result += getObjectString(obj[key], deep + 1);
-      result += `${sign.nested.repeat(deep)}}\n`;
-    } else {
-      result += `${sign.nested.repeat(deep)}${key}: ${obj[key]}\n`;
+  const data = keys.map((key) => {
+    if (_.isObject(obj[key])) {
+      const indent = sign.nested.repeat(deep + 1);
+      return `\n${indent}${key}: {${getStringObject(obj[key], deep + 1)}\n${indent}}`;
     }
+    return `\n${getStringBase('unchanged', key, obj[key], deep)}`;
+  });
+  return data.join('');
+};
+
+const getString = (status, key, value, deep) => {
+  if (_.isObject(value)) {
+    const title = getString(status, key, '', deep);
+    const stringObj = getStringObject(value, deep + 1);
+    const indent = sign.nested.repeat(deep + 1);
+    const result = `${title}{${stringObj}\n${indent}}`;
+    return result;
   }
-  return result;
+  return getStringBase(status, key, value, deep);
 };
 
-const buildString = (difference) => {
-  let result = '{\n';
-  const iter = (diff, deep) => {
-  /* eslint-disable-next-line */
-    for (const item of diff) {
-      if (item.status === 'added') {
-        if (typeof item.new === 'object') {
-          result += getString(item, deep, '', '{');
-          result += getObjectString(item.new, deep + 2);
-          result += `${sign.nested.repeat(deep + 1)}}\n`;
-        } else {
-          result += getString(item, deep, item.new);
-        }
-      } else if (item.status === 'removed') {
-        if (typeof item.old === 'object') {
-          result += getString(item, deep, '', '{');
-          result += getObjectString(item.old, deep + 2);
-          result += `${sign.nested.repeat(deep + 1)}}\n`;
-        } else {
-          result += getString(item, deep, item.old);
-        }
-      } else if (item.status === 'unchanged') {
-        result += getString(item, deep, item.value);
-      } else if (item.status === 'changed') {
-        item.status = 'removed';
-        if (typeof item.old === 'object' && item.old !== null) {
-          result += getString(item, deep, '', '{');
-          result += getObjectString(item.old, deep + 2);
-          result += `${sign.nested.repeat(deep + 1)}}\n`;
-        } else {
-          result += getString(item, deep, item.old);
-        }
-        item.status = 'added';
-        if (typeof item.new === 'object' && item.new !== null) {
-          result += getString(item, deep, '', '{');
-          result += getObjectString(item.new, deep + 2);
-          result += `${sign.nested.repeat(deep + 1)}}\n`;
-        } else {
-          result += getString(item, deep, item.new);
-        }
-        item.status = 'changed';
-      } else if (item.status === 'nested') {
-        result += getString(item, deep, '', '{');
-        iter(item.children, deep + 1);
-        result += `${sign.nested.repeat(deep + 1)}}\n`;
-      }
+const buildString = (item, deep = 0) => {
+  switch (item.status) {
+    case 'added':
+      return getString(item.status, item.key, item.new, deep);
+    case 'removed':
+      return getString(item.status, item.key, item.old, deep);
+    case 'changed':
+      return [
+        getString('removed', item.key, item.old, deep),
+        getString('added', item.key, item.new, deep),
+      ].join('\n');
+    case 'nested': {
+      const indent = sign.nested.repeat(deep + 1);
+      const value = item.children.map((obj) => buildString(obj, deep + 1));
+      const string = `${sign.nested.repeat(deep)}${sign[item.status]}${item.key}: {\n${value.join('\n')}\n${indent}}`;
+      return string;
     }
-  };
-  iter(difference, 0);
-  return `${result}}`;
+    default:
+      return getString(item.status, item.key, item.value, deep);
+  }
 };
 
-export const stylish = (difference) => buildString(difference);
+export const stylish = (difference) => {
+  const lines = difference.map((item) => buildString(item));
+  return ['{', ...lines, '}'].join('\n');
+};
 
 export default stylish;

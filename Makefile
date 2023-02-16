@@ -2,7 +2,7 @@ install:
 	npm ci
 
 start:
-	gendiff '__fixtures__/deep-file1.yml' '__fixtures__/deep-file2.yml' -f 'json'
+	gendiff '__fixtures__/deep-file1.yml' '__fixtures__/deep-file2.yml' -f plain
 
 lint:
 	npx eslint .
